@@ -60,7 +60,7 @@ public class DefaultMailCreator implements MailCreator {
 			message.setMimeType("text/html");
 			message.setSubject("Flow '" + flow.getFlowId() + "' has failed on " + azkabanName);
 
-			message.println("<h2 style=\"color:#FF0000\"> Execution '" + flow.getExecutionId() + "' of flow '" + flow.getFlowId() + "' has encountered a failure on " + azkabanName + "</h2>");
+			message.println("<h2 style=\"color:#FF0000\"> Execution '" + flow.getExecutionId() + "' of flow '" + flow.getFlowId() + "' has encountered a failure on " + azkabanName + " and there are " + flow.getLeftAttempts() + " attempts left.</h2>");
 
 			if (option.getFailureAction() == FailureAction.CANCEL_ALL) {
 				message.println("This flow is set to cancel all currently running jobs.");
@@ -109,7 +109,7 @@ public class DefaultMailCreator implements MailCreator {
 			message.setMimeType("text/html");
 			message.setSubject("Flow '" + flow.getFlowId() + "' has failed on " + azkabanName);
 
-			message.println("<h2 style=\"color:#FF0000\"> Execution '" + execId + "' of flow '" + flow.getFlowId() + "' has failed on " + azkabanName + "</h2>");
+			message.println("<h2 style=\"color:#FF0000\"> Execution '" + execId + "' of flow '" + flow.getFlowId() + "' has failed on " + azkabanName + " and there are " + flow.getLeftAttempts() + " attempts left.</h2>");
 			message.println("<table>");
 			message.println("<tr><td>Start Time</td><td>" + flow.getStartTime() + "</td></tr>");
 			message.println("<tr><td>End Time</td><td>" + flow.getEndTime() + "</td></tr>");

@@ -28,8 +28,9 @@ import azkaban.utils.JSONUtils;
 
 public class Trigger {
 	
+	public static int TRIGGER_RETRIES = 5;
 	private static Logger logger = Logger.getLogger(Trigger.class);
-	
+
 	private int triggerId = -1;
 	private long lastModifyTime;
 	private long submitTime;
@@ -51,7 +52,10 @@ public class Trigger {
 	private boolean resetOnExpire = true;
 	
 	private long nextCheckTime = -1;
-	
+	private Boolean retriesCheck = false;
+	private int triggerRetries = TRIGGER_RETRIES;
+	private int attempt = 0;
+
 	@SuppressWarnings("unused")
 	private Trigger() throws TriggerManagerException {	
 		throw new TriggerManagerException("Triggers should always be specified");
@@ -75,6 +79,34 @@ public class Trigger {
 
 	public String getSubmitUser() {
 		return submitUser;
+	}
+
+	public int getTriggerRetries() {
+		return triggerRetries;
+	}
+
+	public void setTriggerRetries(int triggerRetries) {
+		this.triggerRetries = triggerRetries;
+	}
+
+	public int getAttempt() {
+		return attempt;
+	}
+
+	public void attemptIncrement() {
+		attempt++;
+	}
+
+	public void attemptClear() {
+		attempt = 0;
+	}
+
+	public Boolean getRetriesCheck() {
+		return retriesCheck;
+	}
+
+	public void setRetriesCheck(Boolean retriesCheck) {
+		this.retriesCheck = retriesCheck;
 	}
 
 	public TriggerStatus getStatus() {
@@ -369,6 +401,8 @@ public class Trigger {
 		jsonObj.put("status", status.toString());
 		jsonObj.put("info", info);
 		jsonObj.put("context", context);
+		jsonObj.put("retriesCheck", String.valueOf(retriesCheck));
+		jsonObj.put("triggerRetries", String.valueOf(triggerRetries));
 		return jsonObj;
 	}
 	
@@ -433,10 +467,18 @@ public class Trigger {
 				action.setContext(context);
 			}
 			
+			Boolean retriesCheck = Boolean.valueOf((String) jsonObj.get("retriesCheck"));
+			int triggerRetries = TRIGGER_RETRIES;
+			String triggerRetriesString = (String) jsonObj.get("triggerRetries");
+			if(triggerRetriesString != null)
+				triggerRetries = Integer.valueOf(triggerRetriesString);
 			trigger = new Trigger(triggerId, lastModifyTime, submitTime, submitUser, source, triggerCond, expireCond, actions, expireActions, info, context);
 			trigger.setResetOnExpire(resetOnExpire);
 			trigger.setResetOnTrigger(resetOnTrigger);
 			trigger.setStatus(status);
+			if(retriesCheck != null)
+				trigger.setRetriesCheck(retriesCheck);
+			trigger.setTriggerRetries(triggerRetries);
 		}catch(Exception e) {
 			e.printStackTrace();
 			logger.error("Failed to decode the trigger.", e);

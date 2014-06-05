@@ -58,6 +58,7 @@ import azkaban.scheduler.ScheduleManager;
 import azkaban.scheduler.ScheduleManagerException;
 import azkaban.scheduler.ScheduleStatisticManager;
 import azkaban.sla.SlaOption;
+import azkaban.trigger.Trigger;
 import azkaban.trigger.TriggerStatus;
 import azkaban.user.Permission;
 import azkaban.user.Permission.Type;
@@ -725,9 +726,19 @@ public class ScheduleServlet extends LoginAbstractAzkabanServlet {
 			ret.put("error", e.getMessage());
 		}
 		
+		int scheduleRetries = Trigger.TRIGGER_RETRIES;
+		Boolean retriesCheck = false;
+		try {
+			if (hasParam(req, "retriesCheck") && getParam(req, "retriesCheck").equals("on")) {
+				retriesCheck = true;
+				scheduleRetries = getIntParam(req, "scheduleRetries");
+			}
+		} catch (Exception e) {
+			ret.put("error", e.getMessage());
+		}
 		List<SlaOption> slaOptions = null;
 		
-		Schedule schedule = scheduleManager.scheduleFlow(-1, projectId, projectName, flowName, TriggerStatus.READY.toString(), firstSchedTime.getMillis(), firstSchedTime.getZone(), thePeriod, DateTime.now().getMillis(), firstSchedTime.getMillis(), firstSchedTime.getMillis(), user.getUserId(), flowOptions, slaOptions);
+		Schedule schedule = scheduleManager.scheduleFlow(-1, projectId, projectName, flowName, TriggerStatus.READY.toString(), firstSchedTime.getMillis(), firstSchedTime.getZone(), thePeriod, DateTime.now().getMillis(), firstSchedTime.getMillis(), firstSchedTime.getMillis(), user.getUserId(), flowOptions, slaOptions, retriesCheck, scheduleRetries);
 		logger.info("User '" + user.getUserId() + "' has scheduled " + "[" + projectName + flowName +  " (" + projectId +")" + "].");
 		projectManager.postProjectEvent(project, EventType.SCHEDULE, user.getUserId(), "Schedule " + schedule.toString() + " has been added.");
 

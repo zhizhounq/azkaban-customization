@@ -802,6 +802,9 @@ public class ExecutorManager extends EventHandler implements ExecutorManagerAdap
 							if(flow.getScheduleId() >= 0 && flow.getStatus() == Status.SUCCEEDED){
 								ScheduleStatisticManager.invalidateCache(flow.getScheduleId(), cacheDir);
 							}
+							if (flow.getStatus() == Status.SUCCEEDED) {
+								fireEventListeners(Event.create(flow, Type.FLOW_SUCCESSFUL));
+							}
 							fireEventListeners(Event.create(flow, Type.FLOW_FINISHED));
 							recentlyFinished.put(flow.getExecutionId(), flow);
 						}

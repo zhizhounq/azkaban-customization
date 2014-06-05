@@ -206,7 +206,9 @@ public class Schedule2Trigger {
 					}
 				}
 				
-				azkaban.scheduler.Schedule schedule = new azkaban.scheduler.Schedule(-1, projectId, projectName, flowName, "ready", firstSchedTimeLong, timezone, period, DateTime.now().getMillis(), nextExecTimeLong, submitTimeLong, submitUser, executionOptions, slaOptions);
+				Boolean retriesCheck = schedProps.getBoolean("retriesCheck", false);
+				int scheduleRetries = schedProps.getInt("scheduleRetries", Trigger.TRIGGER_RETRIES);
+				azkaban.scheduler.Schedule schedule = new azkaban.scheduler.Schedule(-1, projectId, projectName, flowName, "ready", firstSchedTimeLong, timezone, period, DateTime.now().getMillis(), nextExecTimeLong, submitTimeLong, submitUser, executionOptions, slaOptions, retriesCheck, scheduleRetries);
 				Trigger t = scheduleToTrigger(schedule);
 				logger.info("Ready to insert trigger " + t.getDescription());
 				triggerLoader.addTrigger(t);

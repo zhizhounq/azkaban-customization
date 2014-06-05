@@ -177,6 +177,7 @@ public class TriggerManager extends EventHandler implements TriggerManagerAdapte
 	private class TriggerScannerThread extends Thread {
 		private BlockingQueue<Trigger> triggers;
 		private Map<Integer, ExecutableFlow> justFinishedFlows;
+		private Map<Integer, ExecutableFlow> justFinishedSuccessfulFlows;
 		private boolean shutdown = false;
 		//private AtomicBoolean stillAlive = new AtomicBoolean(true);
 		private final long scannerInterval;
@@ -184,6 +185,7 @@ public class TriggerManager extends EventHandler implements TriggerManagerAdapte
 		public TriggerScannerThread(long scannerInterval) {
 			triggers = new PriorityBlockingQueue<Trigger>(1, new TriggerComparator());
 			justFinishedFlows = new ConcurrentHashMap<Integer, ExecutableFlow>();
+			justFinishedSuccessfulFlows = new ConcurrentHashMap<Integer, ExecutableFlow>();
 			this.setName("TriggerRunnerManager-Trigger-Scanner-Thread");
 			this.scannerInterval = scannerInterval;
 		}
@@ -201,6 +203,12 @@ public class TriggerManager extends EventHandler implements TriggerManagerAdapte
 			}
 		}
 		
+		public void addJustFinishedSuccessfulFlow(ExecutableFlow flow) {
+			synchronized (syncObj) {
+				justFinishedSuccessfulFlows.put(flow.getExecutionId(), flow);
+			}
+		}
+
 		public void addTrigger(Trigger t) {
 			synchronized (syncObj) {
 				t.updateNextCheckTime();
@@ -222,8 +230,10 @@ public class TriggerManager extends EventHandler implements TriggerManagerAdapte
 						scannerStage = "Ready to start a new scan cycle at " + lastRunnerThreadCheckTime;
 						
 						try {
+							checkTriggersRetries();
 							checkAllTriggers();
 							justFinishedFlows.clear();
+							justFinishedSuccessfulFlows.clear();
 						} catch(Exception e) {
 							e.printStackTrace();
 							logger.error(e.getMessage());
@@ -292,6 +302,8 @@ public class TriggerManager extends EventHandler implements TriggerManagerAdapte
 			for(TriggerAction action : actions) {
 				try {
 					logger.info("Doing trigger actions");
+					action.setTriggerId(t.getTriggerId());
+					action.setLeftAttempts(t.getTriggerRetries() - t.getAttempt() - 1);
 					action.doAction();
 				} catch (Exception e) {
 					logger.error("Failed to do action " + action.getDescription(), e);
@@ -318,6 +330,8 @@ public class TriggerManager extends EventHandler implements TriggerManagerAdapte
 			for(TriggerAction action : expireActions) {
 				try {
 					logger.info("Doing expire actions");
+					action.setTriggerId(t.getTriggerId());
+					action.setLeftAttempts(t.getTriggerRetries() - t.getAttempt() - 1);
 					action.doAction();
 				} catch (Exception e) {
 					logger.error("Failed to do expire action " + action.getDescription(), e);
@@ -339,6 +353,35 @@ public class TriggerManager extends EventHandler implements TriggerManagerAdapte
 			}
 		}
 		
+		private void checkTriggersRetries() throws TriggerManagerException {
+			for (ExecutableFlow flow : justFinishedSuccessfulFlows.values()) {
+				Integer triggerId = flow.getTriggerId();
+				if(triggerId != null) {
+					Trigger trigger = triggerIdMap.get(triggerId.intValue());
+					if (trigger != null) {
+						trigger.attemptClear();
+					}
+				}
+			}
+			for (ExecutableFlow flow : justFinishedFlows.values()) {
+                                Integer triggerId = flow.getTriggerId();
+				if(triggerId != null) {
+					Trigger trigger = triggerIdMap.get(triggerId.intValue());
+					if (trigger != null && trigger.getRetriesCheck()) {
+						trigger.attemptIncrement();
+						if (trigger.getAttempt() >= trigger.getTriggerRetries()) {
+							trigger.setStatus(TriggerStatus.PAUSED);
+							try {
+								triggerLoader.updateTrigger(trigger);
+							} catch (TriggerLoaderException e) {
+								throw new TriggerManagerException(e);
+							}
+						}
+					}
+				}
+			}
+		}
+
 		private class TriggerComparator implements Comparator<Trigger> {
 			@Override
 			public int compare(Trigger arg0, Trigger arg1) {
@@ -415,20 +458,21 @@ public class TriggerManager extends EventHandler implements TriggerManagerAdapte
 		updateTrigger(t);
 	}
 
-    @Override
-    public void setTriggerStatus(int id, TriggerStatus status) throws TriggerManagerException {
-        synchronized (syncObj) {
-            Trigger t = triggerIdMap.get(id);
-            if(t != null) {
-                t.setStatus(status);
-                try {
-                    triggerLoader.updateTrigger(t);
-                } catch (TriggerLoaderException e) {
-                    throw new TriggerManagerException(e);
-                }
-            }
-        }
-    }
+	@Override
+	public void setTriggerStatus(int id, TriggerStatus status) throws TriggerManagerException {
+		synchronized (syncObj) {
+			Trigger t = triggerIdMap.get(id);
+			if (t != null) {
+				t.setStatus(status);
+				t.attemptClear();
+				try {
+					triggerLoader.updateTrigger(t);
+				} catch (TriggerLoaderException e) {
+					throw new TriggerManagerException(e);
+				}
+			}
+		}
+	}
 
 	@Override
 	public void shutdown() {
@@ -515,6 +559,9 @@ public class TriggerManager extends EventHandler implements TriggerManagerAdapte
 				if (event.getType() == Type.FLOW_FINISHED) {
 					logger.info("Flow finish event received. " + flow.getExecutionId() );
 					runnerThread.addJustFinishedFlow(flow);
+				} else if (event.getType() == Type.FLOW_SUCCESSFUL) {
+					logger.info("Flow succeed event received. " + flow.getExecutionId());
+					runnerThread.addJustFinishedSuccessfulFlow(flow);
 				}
 			}
 		}

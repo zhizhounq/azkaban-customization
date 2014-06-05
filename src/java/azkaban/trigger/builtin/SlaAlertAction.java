@@ -169,4 +169,14 @@ public class SlaAlertAction implements TriggerAction{
 		return type + " for " + execId + " with " + slaOption.toString();
 	}
 
+	@Override
+	public void setTriggerId(int triggerId) {
+
+	}
+
+        @Override
+        public void setLeftAttempts(int leftAttempts) {
+
+        }
+
 }

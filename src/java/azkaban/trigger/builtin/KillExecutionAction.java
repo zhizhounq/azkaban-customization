@@ -107,4 +107,14 @@ public class KillExecutionAction implements TriggerAction{
 		return type + " for " + execId;
 	}
 
+	@Override
+	public void setTriggerId(int TriggerId) {
+
+	}
+
+	@Override
+	public void setLeftAttempts(int leftAttempts) {
+
+	}
+
 }

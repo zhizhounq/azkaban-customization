@@ -103,5 +103,14 @@ public class SendEmailAction implements TriggerAction {
 		return type;
 	}
 
-	
+	@Override
+	public void setTriggerId(int triggerId) {
+
+	}
+
+        @Override
+        public void setLeftAttempts(int leftAttempts) {
+
+        }
+
 }

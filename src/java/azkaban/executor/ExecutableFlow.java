@@ -45,7 +45,9 @@ public class ExecutableFlow extends ExecutableFlowBase {
 	private long submitTime = -1;
 	private String submitUser;
 	private String executionPath;
-	
+	private Integer triggerId = null;
+	private int leftAttempts = 0;
+
 	private HashSet<String> proxyUsers = new HashSet<String>();
 	private ExecutionOptions executionOptions;
 	
@@ -230,5 +232,21 @@ public class ExecutableFlow extends ExecutableFlowBase {
 		super.resetForRetry();
 		this.setStatus(Status.RUNNING);
 	}
-	
+
+	public void setTriggerId(int triggerId) {
+		this.triggerId = triggerId;
+	}
+
+	public Integer getTriggerId() {
+		return this.triggerId;
+	}
+
+	public void setLeftAttempts(int leftAttempts) {
+		this.leftAttempts = leftAttempts;
+	}
+
+	public int getLeftAttempts() {
+		return leftAttempts;
+	}
+
 }

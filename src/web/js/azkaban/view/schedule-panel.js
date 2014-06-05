@@ -19,7 +19,8 @@ $.namespace('azkaban');
 var schedulePanelView;
 azkaban.SchedulePanelView = Backbone.View.extend({
 	events: {
-		"click #schedule-button": "scheduleFlow"
+		"click #schedule-button": "scheduleFlow",
+		"click #retries_details_button": "retriesHelp"
 	},
 
 	initialize: function(settings) {
@@ -37,7 +38,11 @@ azkaban.SchedulePanelView = Backbone.View.extend({
 	hideSchedulePanel: function() {
 		$('#schedule-modal').modal("hide");
 	},
-	
+
+	retriesHelp: function() {
+		$('#retries_detail').toggle();
+	},
+
 	scheduleFlow: function() {
     var timeVal = $('#timepicker').val();
 		var timezoneVal = $('#timezone').val();
@@ -61,14 +66,19 @@ azkaban.SchedulePanelView = Backbone.View.extend({
 		var is_recurring = document.getElementById('is_recurring').checked 
 				? 'on' : 'off'; 
 		var period = $('#period').val() + $('#period_units').val();
-		
+
+		var retriesCheck = document.getElementById('retries_check').checked
+				? 'on' : 'off';
+		var scheduleRetries = $('#schedule_retries').val();
 		scheduleData.ajax = "scheduleFlow";
 		scheduleData.projectName = projectName;
 		scheduleData.scheduleTime = scheduleTime;
 		scheduleData.scheduleDate = scheduleDate;
 		scheduleData.is_recurring = is_recurring;
 		scheduleData.period = period;
-			
+		scheduleData.retriesCheck = retriesCheck;
+		scheduleData.scheduleRetries = scheduleRetries;
+
 		var successHandler = function(data) {
 			if (data.error) {
 				schedulePanelView.hideSchedulePanel();

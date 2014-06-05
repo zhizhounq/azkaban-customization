@@ -34,6 +34,7 @@ import org.joda.time.Weeks;
 
 import azkaban.executor.ExecutionOptions;
 import azkaban.sla.SlaOption;
+import azkaban.trigger.Trigger;
 import azkaban.utils.Pair;
 
 public class Schedule{
@@ -60,7 +61,10 @@ public class Schedule{
 	
 	private ExecutionOptions executionOptions;
 	private List<SlaOption> slaOptions;
-	
+
+	private Boolean retriesCheck = false;
+	private int scheduleRetries = Trigger.TRIGGER_RETRIES;
+
 	public Schedule(
 						int scheduleId,
 						int projectId,
@@ -89,7 +93,9 @@ public class Schedule{
 				submitTime,
 				submitUser,
 				null,
-				null
+				null,
+				false,
+				Trigger.TRIGGER_RETRIES
 				);
 	}
 
@@ -121,7 +127,9 @@ public class Schedule{
 				submitTime,
 				submitUser,
 				executionOptions,
-				slaOptions
+				slaOptions,
+				false,
+				Trigger.TRIGGER_RETRIES
 				);
 	}
 
@@ -139,7 +147,9 @@ public class Schedule{
 						long submitTime,
 						String submitUser,
 						ExecutionOptions executionOptions,
-						List<SlaOption> slaOptions
+						List<SlaOption> slaOptions,
+						Boolean retriesCheck,
+						int scheduleRetries
 						) {
 		this.scheduleId = scheduleId;
 		this.projectId = projectId;
@@ -155,6 +165,8 @@ public class Schedule{
 		this.submitTime = submitTime;
 		this.executionOptions = executionOptions;
 		this.slaOptions = slaOptions;
+		this.retriesCheck = retriesCheck;
+		this.scheduleRetries = scheduleRetries;
 	}
 
 	public ExecutionOptions getExecutionOptions() {
@@ -407,5 +419,21 @@ public class Schedule{
 	public boolean skipPastOccurrences() {
 		return skipPastOccurrences;
 	}
-	
+
+	public int getScheduleRetries() {
+		return scheduleRetries;
+	}
+
+	public void setScheduleRetries(int triggerRetries) {
+		this.scheduleRetries = triggerRetries;
+	}
+
+	public Boolean getRetriesCheck() {
+		return retriesCheck;
+	}
+
+	public void setRetriesCheck(Boolean retriesCheck) {
+		this.retriesCheck = retriesCheck;
+	}
+
 }

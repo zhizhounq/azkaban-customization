@@ -29,6 +29,7 @@ import org.joda.time.format.DateTimeFormatter;
 
 import azkaban.executor.ExecutionOptions;
 import azkaban.sla.SlaOption;
+import azkaban.trigger.Trigger;
 import azkaban.trigger.TriggerAgent;
 import azkaban.trigger.TriggerStatus;
 import azkaban.utils.Pair;
@@ -224,7 +225,7 @@ public class ScheduleManager implements TriggerAgent {
 			final long submitTime,
 			final String submitUser
 			) {
-		return scheduleFlow(scheduleId, projectId, projectName, flowName, status, firstSchedTime, timezone, period, lastModifyTime, nextExecTime, submitTime, submitUser, null, null);
+		return scheduleFlow(scheduleId, projectId, projectName, flowName, status, firstSchedTime, timezone, period, lastModifyTime, nextExecTime, submitTime, submitUser, null, null, false, Trigger.TRIGGER_RETRIES);
 	}
 	
 	public Schedule scheduleFlow(
@@ -241,9 +242,11 @@ public class ScheduleManager implements TriggerAgent {
 			final long submitTime,
 			final String submitUser,
 			ExecutionOptions execOptions,
-			List<SlaOption> slaOptions
+			List<SlaOption> slaOptions,
+			Boolean retriesCheck,
+			int scheduleRetries
 			) {
-		Schedule sched = new Schedule(scheduleId, projectId, projectName, flowName, status, firstSchedTime, timezone, period, lastModifyTime, nextExecTime, submitTime, submitUser, execOptions, slaOptions);
+		Schedule sched = new Schedule(scheduleId, projectId, projectName, flowName, status, firstSchedTime, timezone, period, lastModifyTime, nextExecTime, submitTime, submitUser, execOptions, slaOptions, retriesCheck, scheduleRetries);
 		logger.info("Scheduling flow '" + sched.getScheduleName() + "' for "
 				+ _dateFormat.print(firstSchedTime) + " with a period of "
 				+ period == null ? "(non-recurring)" : period);

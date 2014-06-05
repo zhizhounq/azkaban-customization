@@ -53,7 +53,9 @@ public class ExecuteFlowAction implements TriggerAction {
 	private static ProjectManager projectManager;
 	private ExecutionOptions executionOptions = new ExecutionOptions();
 	private List<SlaOption> slaOptions;
-	
+	private int triggerId = -1;
+	private int leftAttempts = 0;
+
 	private static Logger logger = Logger.getLogger(ExecuteFlowAction.class);
 	
 	public ExecuteFlowAction(String actionId, int projectId, String projectName, String flowName, String submitUser, ExecutionOptions executionOptions, List<SlaOption> slaOptions) {
@@ -219,7 +221,9 @@ public class ExecuteFlowAction implements TriggerAction {
 		ExecutableFlow exflow = new ExecutableFlow(project, flow);
 		exflow.setSubmitUser(submitUser);
 		exflow.addAllProxyUsers(project.getProxyUsers());
-		
+		exflow.setTriggerId(triggerId);
+		exflow.setLeftAttempts(leftAttempts);
+
 		if(executionOptions == null) {
 			executionOptions = new ExecutionOptions();
 		}
@@ -291,6 +295,16 @@ public class ExecuteFlowAction implements TriggerAction {
 	@Override
 	public String getId() {
 		return actionId;
+	}
+
+	@Override
+	public void setTriggerId(int triggerId) {
+		this.triggerId = triggerId;
+	}
+
+	@Override
+	public void setLeftAttempts(int leftAttempts) {
+		this.leftAttempts = leftAttempts;
 	}
 
 }

@@ -20,6 +20,7 @@ public class Event {
 	public enum Type {
 		FLOW_STARTED,
 		FLOW_FINISHED,
+		FLOW_SUCCESSFUL,
 		JOB_STARTED,
 		JOB_FINISHED,
 		JOB_STATUS_CHANGED,

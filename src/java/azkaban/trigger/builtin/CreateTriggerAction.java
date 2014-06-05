@@ -93,4 +93,14 @@ public class CreateTriggerAction implements TriggerAction {
 		this.context = context;
 	}
 
+	@Override
+	public void setTriggerId(int triggerId) {
+
+	}
+
+	@Override
+	public void setLeftAttempts(int leftAttempts) {
+
+	}
+
 }

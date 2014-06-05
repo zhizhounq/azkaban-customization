@@ -30,4 +30,5 @@ there are two buttons to disable or enable schedules.
 
 todo list:
 disable scheduls when workflows fails some times continuously.
-enable CRUD workflow from web portal
+enable CIUD workflow from web portal
+

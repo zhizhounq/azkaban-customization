@@ -33,5 +33,9 @@ public interface TriggerAction {
 	void setContext(Map<String, Object> context);
 
 	String getDescription();
-	
+
+	void setTriggerId(int triggerId);
+
+	void setLeftAttempts(int leftAttempts);
+
 }

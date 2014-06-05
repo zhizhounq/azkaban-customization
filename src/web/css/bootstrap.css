@@ -886,6 +886,18 @@ pre code {
   padding-left: 15px;
 }
 
+.help {
+  border: solid #bbb 1px;
+  background-color: #f0f0f0;
+  padding: 1em;
+  margin-bottom: 1em;
+}
+
+.col-detail {
+  text-align: right;
+  padding-right: 15px;
+}
+
 .col-xs-1,
 .col-xs-2,
 .col-xs-3,
@@ -6109,7 +6121,7 @@ button.close {
 
 @media screen and (min-width: 768px) {
   .modal-dialog {
-    width: 600px;
+    width: 750px;
     padding-top: 30px;
     padding-bottom: 30px;
   }
