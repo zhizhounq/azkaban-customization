@@ -3,17 +3,20 @@ Azkaban2
 
 > 1. Add a lock jobtype to prevent some jobs on different workflows from running at the same time.
 > Examples:
+
 ```
 lock:
 		type=lock              //jobtype
 		dependencies=foo
 		lock=lockTest         //lock name
-> 
+```
+```
 unlock:
 		type=lock              //jobtype
 		dependencies=bar
 		unlock=lockTest        //lock name
 ```
+
 > Attentions:
 > Lock job and unlock job should be used in pairs
 > The workflow will release all its locks before quitting no matter it fails or succeeds
