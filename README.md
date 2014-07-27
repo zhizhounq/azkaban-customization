@@ -8,7 +8,7 @@ lock:
 		type=lock              //jobtype
 		dependencies=foo
 		lock=lockTest         //lock name
-
+> 
 unlock:
 		type=lock              //jobtype
 		dependencies=bar
