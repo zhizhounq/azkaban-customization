@@ -37,7 +37,7 @@ It is very useful when the workflow is easy to be failed and the scheduling inte
 
 # 4. Provide CRUD (create, retrieve, update, delete) operations for workflows from web portal.
 
-It is complex and unintuitive when we create, retrieve or update the workflows. for example, when we need to add a job to the present workflow, we need to create a file to describe the job, make a zip file to contain the whole workflow, upload the file to test whether it works well or not, and we need to repeat the process if it is wrong.
+It is complex and unintuitive when we create, retrieve or update the workflows. for example, when we need to add a job to the present workflow, we need to create a file to describe the job, make a zip file to contain the whole workflow, upload the zip file to test whether it works well or not, and we need to repeat the process if it is wrong.
 
 But now we could create, retrieve and update workflows easily and friendly from azkaban portal.
 
