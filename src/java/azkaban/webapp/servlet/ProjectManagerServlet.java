@@ -139,7 +139,8 @@ public class ProjectManagerServlet extends LoginAbstractAzkabanServlet {
 			}
 			return;
 		}
-		
+		if(hasParam(req, "project") && hasParam(req, "ajax") && getParam(req, "ajax").equals("editworkflow"))
+			return;
 		Page page = newPage(req, resp, session, "azkaban/webapp/servlet/velocity/projectpage.vm");
 		page.add("errorMsg", "No project set.");
 		page.render();
@@ -268,6 +269,12 @@ public class ProjectManagerServlet extends LoginAbstractAzkabanServlet {
 		else if (ajaxName.equals("setJobOverrideProperty")) {
 			if (handleAjaxPermission(project, user, Type.WRITE, ret)) {
 				ajaxSetJobOverrideProperty(project, ret, req);
+			}
+		}
+		else if(ajaxName.equals("editWorkflow")) {
+			if (handleAjaxPermission(project, user, Type.WRITE, ret)) {
+				ajaxEditWorkflow(project, ret, req, resp);
+				return ;
 			}
 		}
 		else {
@@ -573,7 +580,16 @@ public class ProjectManagerServlet extends LoginAbstractAzkabanServlet {
 		}
 
 	}
-		
+
+	private void ajaxEditWorkflow(Project project, HashMap<String, Object> ret, HttpServletRequest req, HttpServletResponse resp) throws ServletException {
+		try {
+			projectManager.getWorkflow(project, ret, resp);
+		} catch (Exception e) {
+			ret.put("error", "Failed to upload job override property");
+			throw new ServletException(e);
+		}
+	}
+
 	private void ajaxFetchProjectFlows(Project project, HashMap<String, Object> ret, HttpServletRequest req) throws ServletException {
 		ArrayList<Map<String,Object>> flowList = new ArrayList<Map<String,Object>>();
 		for (Flow flow: project.getFlows()) {
@@ -1416,7 +1432,7 @@ public class ProjectManagerServlet extends LoginAbstractAzkabanServlet {
 		if (ret.containsKey("error")) {
 			setErrorMessageInCookie(resp, ret.get("error"));
 		}
-
+		logger.info("redirect " + projectName);
 		resp.sendRedirect(req.getRequestURI() + "?project=" + projectName);
 	}
 

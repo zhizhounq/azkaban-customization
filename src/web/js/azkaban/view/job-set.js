@@ -16,87 +16,57 @@
 
 $.namespace('azkaban');
 
-var jobEditView;
-azkaban.JobEditView = Backbone.View.extend({
+var nodeEditView;
+azkaban.NodeEditView = Backbone.View.extend({
 	events : {
 		"click" : "closeEditingTarget",
 		"click #set-btn": "handleSet",
-		"click #cancel-btn": "handleCancel",
-		"click #close-btn": "handleCancel",
+		"click #job-cancel-btn": "handleCancel",
+		"click #job-close-btn": "handleCancel",
 		"click #add-btn": "handleAddRow",
 		"click table .editable": "handleEditColumn",
 		"click table .remove-btn": "handleRemoveColumn"
 	},
-	
+
 	initialize: function(setting) {
 		this.projectURL = contextURL + "manager"
 		this.generalParams = {}
 		this.overrideParams = {}
+		this.editNode = {}
 	},
-	
+
 	handleCancel: function(evt) {
-		$('#job-edit-pane').hide();
+		$('#node-edit-pane').hide();
 		var tbl = document.getElementById("generalProps").tBodies[0];
 		var rows = tbl.rows;
 		var len = rows.length;
 		for (var i = 0; i < len-1; i++) {
 			tbl.deleteRow(0);
 		}
+		evt.preventDefault();
+		evt.stopPropagation();
 	},
-	
-	show: function(projectName, flowName, jobName) {
-		this.projectName = projectName;
-		this.flowName = flowName;
-		this.jobName = jobName;
-		
-		var projectURL = this.projectURL
-		
-		$('#job-edit-pane').modal();
-		
-		var handleAddRow = this.handleAddRow;
-		
-		/*var overrideParams;
-		var generalParams;
-		this.overrideParams = overrideParams;
-		this.generalParams = generalParams;*/
-		var fetchJobInfo = {
-			"project": this.projectName, 
-			"ajax": "fetchJobInfo", 
-			"flowName": this.flowName, 
-			"jobName": this.jobName
-		};
-		var mythis = this;
-		var fetchJobSuccessHandler = function(data) {
-			if (data.error) {
-				alert(data.error);
-				return;
-			}
-			document.getElementById('jobName').innerHTML = data.jobName;				
-			document.getElementById('jobType').innerHTML = data.jobType;
-			var generalParams = data.generalParams;
-			var overrideParams = data.overrideParams;
-					
-			/*for (var key in generalParams) {
-				var row = handleAddRow();
-				var td = $(row).find('span');
-				$(td[1]).text(key);
-				$(td[2]).text(generalParams[key]);
-			}*/
-					
-			mythis.overrideParams = overrideParams;
-			mythis.generalParams = generalParams;
-			
-			for (var okey in overrideParams) {
-				if (okey != 'type' && okey != 'dependencies') {
-					var row = handleAddRow();
-					var td = $(row).find('span');
-					$(td[0]).text(okey);
-					$(td[1]).text(overrideParams[okey]);
-				}
-			}
-		};
 
-		$.get(projectURL, fetchJobInfo, fetchJobSuccessHandler, "json");
+	show: function(node) {
+		this.editNode = node;
+		$('#node-edit-pane').modal();
+		var handleAddRow = this.handleAddRow;
+		var editName = $('#jobName');
+		var spanName = $(editName[0]).find('span');
+		$(spanName[0]).text(node.name);
+		var editType = $('#jobType');
+		var spanType = $(editType[0]).find('span');
+		$(spanType[0]).text(node.type);
+
+		var overrideParams = node.props;
+                for (var okey in overrideParams) {
+                       if (okey != 'type' && okey != 'dependencies') {
+                                var row = handleAddRow();
+                                var td = $(row).find('span');
+                               	$(td[0]).text(okey);
+                                $(td[1]).text(overrideParams[okey]);
+                           }
+               }
 	},
 
 	handleSet: function(evt) {
@@ -113,54 +83,43 @@ azkaban.JobEditView = Backbone.View.extend({
 				jobOverride[key] = val;
 			}
 		}
-		
-		var overrideParams = this.overrideParams
-		var generalParams = this.generalParams
-		
-		jobOverride['type'] = overrideParams['type']
-		if ('dependencies' in overrideParams) {
-			jobOverride['dependencies'] = overrideParams['dependencies']
+		var editName = $('#jobName');
+		var spanName = $(editName[0]).find('span');
+		var nodeName = $(spanName[0]).text();
+		var editType = $('#jobType');
+		var spanType = $(editType[0]).find('span');
+		var nodeType = $(spanType[0]).text();
+		var node = this.editNode;
+		node.props = jobOverride;
+		if(nodeName)
+			node.name = nodeName;
+		if(nodeType)
+			node.type = nodeType;
+		graph.updateNode(node);
+		$('#node-edit-pane').hide();
+		var tbl = document.getElementById("generalProps").tBodies[0];
+		var rows = tbl.rows;
+		var len = rows.length;
+		for (var i = 0; i < len-1; i++) {
+			tbl.deleteRow(0);
 		}
-		
-		var project = this.projectName
-		var flowName = this.flowName
-		var jobName = this.jobName
-		
-		var jobOverrideData = {
-			project: project,
-			flowName: flowName,
-			jobName: jobName,
-			ajax: "setJobOverrideProperty",
-			jobOverride: jobOverride
-		};
-
-		var projectURL = this.projectURL
-		var redirectURL = projectURL+'?project='+project+'&flow='+flowName+'&job='+jobName;
-		var jobOverrideSuccessHandler = function(data) {
-			if (data.error) {
-				alert(data.error);
-			}
-			else {
-				window.location = redirectURL;
-			}
-		};
-		
-		$.get(projectURL, jobOverrideData, jobOverrideSuccessHandler, "json");
+		evt.preventDefault();
+		evt.stopPropagation();
 	},
-	
+
 	handleAddRow: function(evt) {
 		var tr = document.createElement("tr");
 		var tdName = document.createElement("td");
-    $(tdName).addClass('property-key');
+		$(tdName).addClass('property-key');
 		var tdValue = document.createElement("td");
 
 		var remove = document.createElement("div");
-    $(remove).addClass("pull-right").addClass('remove-btn');
-    var removeBtn = document.createElement("button");
-    $(removeBtn).attr('type', 'button');
-    $(removeBtn).addClass('btn').addClass('btn-xs').addClass('btn-danger');
-    $(removeBtn).text('Delete');
-    $(remove).append(removeBtn);
+		$(remove).addClass("pull-right").addClass('remove-btn');
+		var removeBtn = document.createElement("button");
+		$(removeBtn).attr('type', 'button');
+		$(removeBtn).addClass('btn').addClass('btn-xs').addClass('btn-danger');
+		$(removeBtn).text('Delete');
+		$(remove).append(removeBtn);
 
 		var nameData = document.createElement("span");
 		$(nameData).addClass("spanValue");
@@ -172,11 +131,11 @@ azkaban.JobEditView = Backbone.View.extend({
 		nameData.myparent = tdName;
 
 		$(tdValue).append(valueData);
-    $(tdValue).append(remove);
+		$(tdValue).append(remove);
 		$(tdValue).addClass("editable");
 		$(tdValue).addClass("value");
 		valueData.myparent = tdValue;
-		
+
 		$(tr).addClass("editRow");
 		$(tr).append(tdName);
 		$(tr).append(tdValue);
@@ -184,20 +143,20 @@ azkaban.JobEditView = Backbone.View.extend({
 		$(tr).insertBefore("#addRow");
 		return tr;
 	},
-	
+
 	handleEditColumn: function(evt) {
 		var curTarget = evt.currentTarget;
 		if (this.editingTarget != curTarget) {
 			this.closeEditingTarget(evt);
-		
+
 			var text = $(curTarget).children(".spanValue").text();
 			$(curTarget).empty();
-						
+
 			var input = document.createElement("input");
 			$(input).attr("type", "text");
-      $(input).addClass("form-control").addClass("input-sm");
+			$(input).addClass("form-control").addClass("input-sm");
 			$(input).val(text);
-			
+
 			$(curTarget).addClass("editing");
 			$(curTarget).append(input);
 			$(input).focus();
@@ -213,14 +172,14 @@ azkaban.JobEditView = Backbone.View.extend({
 		evt.preventDefault();
 		evt.stopPropagation();
 	},
-	
+
 	handleRemoveColumn: function(evt) {
 		var curTarget = evt.currentTarget;
 		// Should be the table
 		var row = curTarget.parentElement.parentElement;
 		$(row).remove();
 	},
-	
+
 	closeEditingTarget: function(evt) {
 		if (this.editingTarget == null ||
 				this.editingTarget == evt.target ||
@@ -236,13 +195,13 @@ azkaban.JobEditView = Backbone.View.extend({
 		$(valueData).text(text);
 
 		if ($(this.editingTarget).hasClass("value")) {
-      var remove = document.createElement("div");
-      $(remove).addClass("pull-right").addClass('remove-btn');
-      var removeBtn = document.createElement("button");
-      $(removeBtn).attr('type', 'button');
-      $(removeBtn).addClass('btn').addClass('btn-xs').addClass('btn-danger');
-      $(removeBtn).text('Delete');
-      $(remove).append(removeBtn);
+			var remove = document.createElement("div");
+			$(remove).addClass("pull-right").addClass('remove-btn');
+			var removeBtn = document.createElement("button");
+			$(removeBtn).attr('type', 'button');
+			$(removeBtn).addClass('btn').addClass('btn-xs').addClass('btn-danger');
+			$(removeBtn).text('Delete');
+			$(remove).append(removeBtn);
 			$(this.editingTarget).append(remove);
 		}
 
@@ -254,7 +213,7 @@ azkaban.JobEditView = Backbone.View.extend({
 });
 
 $(function() {
-	jobEditView = new azkaban.JobEditView({
-		el: $('#job-edit-pane')
+	nodeEditView = new azkaban.NodeEditView({
+		el: $('#node-edit-pane')
 	});
 });

@@ -26,6 +26,11 @@
 		<script type="text/javascript" src="${context}/js/azkaban/view/flow-execute-dialog.js"></script>
 		<script type="text/javascript" src="${context}/js/azkaban/view/project.js"></script>
 		<script type="text/javascript" src="${context}/js/azkaban/view/project-modals.js"></script>
+		<script src="//d3js.org/d3.v3.js" charset="utf-8"></script>
+		<script src="//cdn.jsdelivr.net/filesaver.js/0.1/FileSaver.min.js"></script>
+		<script type="text/javascript" src="${context}/js/azkaban/view/jszip.js"></script>
+		<script type="text/javascript" src="${context}/js/azkaban/view/workflow-create.js"></script>
+		<script type="text/javascript" src="${context}/js/azkaban/view/job-set.js"></script>
 		<script type="text/javascript">
 			var contextURL = "${context}";
 			var currentTime = ${currentTime};

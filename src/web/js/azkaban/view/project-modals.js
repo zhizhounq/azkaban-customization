@@ -19,12 +19,19 @@ $.namespace('azkaban');
 var projectView;
 azkaban.ProjectView = Backbone.View.extend({
 	events: {
+		"click #workflow-create-btn": "handleCreateWorkflow",
 		"click #project-upload-btn": "handleUploadProjectJob",
 		"click #project-delete-btn": "handleDeleteProject"
 	},
 
 	initialize: function(settings) {
 	},
+
+	handleCreateWorkflow: function(evt) {
+		console.log("click create workflow");
+		$('#create-workflow-modal').modal();
+		$('#remote-workflow-edit-btn').click();
+        },
 
 	handleUploadProjectJob: function(evt) {
 		console.log("click upload project");

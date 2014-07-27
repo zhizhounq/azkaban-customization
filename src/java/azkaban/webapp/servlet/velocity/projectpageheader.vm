@@ -22,6 +22,9 @@
           </div>
           <div class="header-control">
             <div class="header-form pull-right" id="project-options">
+              <button id="workflow-create-btn" class="btn btn-sm btn-primary">
+                <span class="glyphicon glyphicon-upload"></span> Edit Workflow
+              </button>
               <button id="project-delete-btn" class="btn btn-sm btn-danger">
                 <span class="glyphicon glyphicon-trash"></span> Delete Project
               </button>
