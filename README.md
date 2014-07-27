@@ -1,7 +1,8 @@
 Azkaban2
 ========
-> 
+
 * 1. Add a lock jobtype to prevent some jobs on different workflows from running at the same time.
+
 Examples:
 
 ```
@@ -18,12 +19,15 @@ unlock:
 ```
 
 Attentions:
+
 Lock job and unlock job should be used in pairs
+
 The workflow will release all its locks before quitting no matter it fails or succeeds
 
 
 * 2. Add a function to change the state of shedule (disabled or enabled)
-> There are two buttons to disable or enable schedules, when we need to change some jobs of the
+
+There are two buttons to disable or enable schedules, when we need to change some jobs of the
 > workflow, we could pause its scheduler until we make sure the changes are right.
 
 
