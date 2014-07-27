@@ -2,7 +2,7 @@ Azkaban2
 ========
 > 
 * 1. Add a lock jobtype to prevent some jobs on different workflows from running at the same time.
-> Examples:
+Examples:
 
 ```
 lock:
@@ -17,7 +17,7 @@ unlock:
 		unlock=lockTest        //lock name
 ```
 
-> Attentions:
+Attentions:
 > Lock job and unlock job should be used in pairs
 > The workflow will release all its locks before quitting no matter it fails or succeeds
 > 
