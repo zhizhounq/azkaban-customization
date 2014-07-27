@@ -26,9 +26,16 @@ workflow will release all its locks before quitting no matter it fails or succee
 
 
 2. add a function to change the state of shedule (disabled or enabled)
-there are two buttons to disable or enable schedules.
+there are two buttons to disable or enable schedules, when we need to change some jobs of the workflow, we could pause its scheduler until we make sure the changes are right.
 
-todo list:
-disable scheduls when workflows fails some times continuously.
-enable CIUD workflow from web portal
+
+3. disable scheduls when workflows fails some times continuously.
+it is very useful when the workflow is easy to be failed and the executing interval is short, the times will be set when we set schedule.
+
+
+4. provide CRUD (create, retrieve, update, delete) operations for workflows from web portal.
+it is complex and unintuitive when we create, retrieve or update the workflows. for example, when we need to add a job to present workflow, we need to create a file to describe the job, make a zip file to contain the whole workflow, upload the file to test whether it works well or not, and we need to repeat the process if it is wrong.
+now we could create, retrieve and update workflows easily and friendly.
+
+
 
