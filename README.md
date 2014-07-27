@@ -27,15 +27,15 @@ The workflow will release all its locks before quitting no matter it fails or su
 
 ###  2. Add two buttons to change the state of the shedule (disabled or enabled)
 
-When we need to change some jobs of the workflow, we could pause its scheduler until we make sure the changes are right.
+When we need to change some jobs of the workflow, we could pause its scheduling until we make sure the changes are right.
 
 
-### 3. Disable scheduls when workflows fails some times continuously to avoid receiving massive failure emails.
+### 3. Disable the schedule when the workflow fails some times continuously to avoid receiving massive failure emails.
 
 It is very useful when the workflow is easy to be failed and the scheduling interval is short, the times will be set when we set schedules.
 
 
-# 4. Provide CRUD (create, retrieve, update, delete) operations for workflows from web portal.
+### 4. Provide CRUD (create, retrieve, update, delete) operations for workflows from web portal.
 
 It is complex and unintuitive when we create, retrieve or update the workflows. for example, when we need to add a job to the present workflow, we need to create a file to describe the job, make a zip file to contain the whole workflow, upload the zip file to test whether it works well or not, and we need to repeat the process if it is wrong.
 
